@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://wiki.ros.org/xacro" name="ur5_robot">
+  <!--
+    This is a convenience top-level xacro which loads the macro for the UR5e
+    which defines the default values for the various "parameters files"
+    parameters for a UR5e.
+
+    This file is only useful when loading a stand-alone, completely isolated
+    robot with only default values for all parameters such as the kinematics,
+    visual and physical parameters and joint limits.
+
+    This file is not intended to be integrated into a larger scene or other
+    composite xacro.
+
+    Instead, xacro:include 'inc/ur5e_macro.xacro' and override the defaults
+    for the arguments to that macro.
+
+    Refer to 'inc/ur_macro.xacro' for more information.
+  -->
+  <!-- <xacro:include filename="$(find robot_description)/urdf/inc/ur5_macro.xacro"/> -->
+  <xacro:include filename="inc/ur5_macro.xacro"/>
+  
+  <!-- <xacro:ur5_robot prefix="" /> -->
+  <!-- Declare arguments with default values that will be overridden -->
+  <xacro:arg name="joint_limits_parameters_file" default="joint_limits.yaml"/>
+  <xacro:arg name="kinematics_parameters_file" default="default_kinematics.yaml"/>
+  <xacro:arg name="physical_parameters_file" default="physical_parameters.yaml"/>
+  <xacro:arg name="visual_parameters_file" default="visual_parameters.yaml"/>
+
+
+  <!-- Instantiate the macro with updated parameters -->
+  <!-- <xacro:ur_robot prefix=""
+                  joint_limits_parameters_file="${joint_limits_parameters_file}"
+                  kinematics_parameters_file="${kinematics_parameters_file}"
+                  safety_limits="false"
+                  safety_pos_margin="0.15"
+                  safety_k_position="20"/> -->
+  <!-- mesh_path="$(arg mesh_path)" -->
+
+  <xacro:ur_robot prefix=""
+                  joint_limits_parameters_file="$(arg joint_limits_parameters_file)"
+                  kinematics_parameters_file="$(arg kinematics_parameters_file)"
+                  physical_parameters_file="$(arg physical_parameters_file)"
+                  visual_parameters_file="$(arg visual_parameters_file)"
+                  safety_limits="false"
+                  safety_pos_margin="0.15"
+                  safety_k_position="20"/>
+
+</robot>
