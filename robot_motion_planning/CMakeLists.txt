@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.8)
-project(robot_description)
+project(robot_motion_planning)
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
@@ -7,21 +7,31 @@ endif()
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
-# uncomment the following section in order to fill in
-# further dependencies manually.
-# find_package(<dependency> REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(moveit_core REQUIRED)
+find_package(moveit_ros_planning REQUIRED)
+find_package(moveit_ros_planning_interface REQUIRED)
 
-# Find dependencies
-find_package(ament_cmake REQUIRED)
-find_package(xacro REQUIRED)
+# Add the executable target
+add_executable(robot_motion_node src/robot_motion.cpp)
 
-# Install URDF and mesh files
-install(DIRECTORY urdf/
-  DESTINATION share/${PROJECT_NAME}/urdf
+# target_link_libraries(robot_motion_node
+ament_target_dependencies(robot_motion_node rclcpp moveit_core moveit_ros_planning moveit_ros_planning_interface)
+
+# Install targets (binaries)
+install(TARGETS robot_motion_node
+  DESTINATION lib/${PROJECT_NAME}
 )
 
-install(DIRECTORY meshes/
-  DESTINATION share/${PROJECT_NAME}/meshes
+# Install launch files
+install(DIRECTORY launch/
+  DESTINATION share/${PROJECT_NAME}/launch
+)
+install(DIRECTORY config/
+  DESTINATION share/${PROJECT_NAME}/config
+)
+install(DIRECTORY srdf/
+  DESTINATION share/${PROJECT_NAME}/srdf
 )
 
 
