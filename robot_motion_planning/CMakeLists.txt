@@ -11,12 +11,35 @@ find_package(rclcpp REQUIRED)
 find_package(moveit_core REQUIRED)
 find_package(moveit_ros_planning REQUIRED)
 find_package(moveit_ros_planning_interface REQUIRED)
+# find_package(moveit_ros_visualization REQUIRED)
+find_package(controller_manager REQUIRED)
+find_package(ros2_control REQUIRED)
+# find_package(ros2_controllers REQUIRED)  # Include this for position controllers
+find_package(trajectory_msgs REQUIRED)
+find_package(control_msgs)
+find_package(controller_interface REQUIRED)
+find_package(realtime_tools REQUIRED)
+find_package(ros2_controllers REQUIRED)
+
+
 
 # Add the executable target
 add_executable(robot_motion_node src/robot_motion.cpp)
 
-# target_link_libraries(robot_motion_node
-ament_target_dependencies(robot_motion_node rclcpp moveit_core moveit_ros_planning moveit_ros_planning_interface)
+# Ensure all necessary packages are linked
+ament_target_dependencies(robot_motion_node 
+  rclcpp 
+  moveit_core 
+  moveit_ros_planning 
+  moveit_ros_planning_interface 
+  controller_manager 
+  ros2_control 
+  ros2_controllers 
+  controller_interface 
+  realtime_tools 
+  control_msgs 
+  trajectory_msgs
+)
 
 # Install targets (binaries)
 install(TARGETS robot_motion_node

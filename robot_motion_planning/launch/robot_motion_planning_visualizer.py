@@ -1,105 +1,239 @@
+# import os
+# from ament_index_python.packages import get_package_share_directory
+# from launch import LaunchDescription
+# from launch_ros.actions import Node
+# from launch.substitutions import Command, LaunchConfiguration
+# from launch.actions import DeclareLaunchArgument
+# from launch_ros.parameter_descriptions import ParameterValue
+# import xacro
+# from launch.actions import TimerAction
+
+
+# def generate_launch_description():
+#     # Paths to configuration files
+#     urdf_file = os.path.join(get_package_share_directory('robot_description'), 'urdf', 'ur5.urdf.xacro')
+#     srdf_file = os.path.join(get_package_share_directory('robot_motion_planning'), 'srdf', 'ur5.srdf')
+#     ompl_config = os.path.join(get_package_share_directory('robot_motion_planning'), 'config', 'ompl_planning.yaml')
+#     controllers_config = os.path.join(get_package_share_directory('robot_motion_planning'), 'config', 'controllers.yaml')
+#     moveit_config = os.path.join(get_package_share_directory('robot_motion_planning'), 'config', 'moveit_config.yaml')
+#     rviz_config_file = os.path.join(get_package_share_directory('robot_motion_planning'), 'config', 'moveit.rviz')
+
+#     # Declare robot description and semantic robot description
+#     # robot_description_content = Command([
+#     #     'xacro ', urdf_file,
+#     # ])
+
+#     # robot_description = {
+#     #     'robot_description': ParameterValue(robot_description_content, value_type=str)
+#     # }
+#     urdf_file_new = '/home/sushma/project_1.0/robot_arm/ur5_robot.urdf'
+
+#     # Convert the URDF and SRDF to strings
+#     robot_description_config = xacro.process_file(urdf_file_new).toxml()
+#     with open(srdf_file, 'r') as srdf:
+#         robot_description_semantic_config = srdf.read()
+
+#     # robot_description_semantic_content = Command(['cat ', srdf_file])
+#     # robot_description_semantic = {
+#     #     'robot_description_semantic': ParameterValue(robot_description_semantic_content, value_type=str)
+#     # }
+
+#     # Define the parameters to pass to nodes
+#     robot_description_param = {'robot_description': robot_description_config}
+#     robot_description_semantic_param = {'robot_description_semantic': robot_description_semantic_config}
+
+#         # Generate robot_description from URDF/Xacro
+#     # urdf_file_new = '/home/sushma/project_1.0/robot_arm/ur5_robot.urdf'
+#     robot_description_content = xacro.process_file(urdf_file_new).toxml()
+
+#     return LaunchDescription([
+
+#         # Robot State Publisher
+#         Node(
+#             package='robot_state_publisher',
+#             executable='robot_state_publisher',
+#             output='screen',
+#             parameters=[{'robot_description': robot_description_content}]
+#         ),
+
+#         # Joint State Publisher
+#         Node(
+#             package='joint_state_publisher',
+#             executable='joint_state_publisher',
+#             name='joint_state_publisher',
+#             output='screen',
+#             parameters=[{'robot_description': robot_description_content}]
+#         ),
+#         # # Delay the controller manager to ensure it subscribes to the robot description topic
+#         # TimerAction(
+#         #     period=5.0,  # Delay for 5 seconds
+#         #     actions=[
+#         #         Node(
+#         #             package='controller_manager',
+#         #             executable='ros2_control_node',
+#         #             parameters=[controllers_config],
+#         #             output='screen',
+#         #             arguments=['--ros-args', '--log-level', 'debug']
+#         #         )
+#         #     ]
+#         # ),
+
+
+#         # ROS 2 Control Node
+#         Node(
+#             package='controller_manager',
+#             executable='ros2_control_node',
+#             parameters=[controllers_config],
+#             output='screen',
+#             arguments=['--ros-args', '--log-level', 'debug']
+#         ),
+
+#         Node(
+#             package='controller_manager',
+#             executable='spawner',
+#             arguments=['joint_state_controller', '--controller-manager', '/controller_manager'],
+#             output='screen',
+#         ),
+#         Node(
+#             package='controller_manager',
+#             executable='spawner',
+#             arguments=['pos_joint_traj_controller', '--controller-manager', '/controller_manager'],
+#             output='screen',
+            
+#         ),
+
+#         # Move Group (MoveIt2)
+#         Node(
+#             package='moveit_ros_move_group',
+#             executable='move_group',
+#             output='screen',
+#             parameters=[robot_description_content,
+#                 robot_description_semantic_param,
+#                 {
+#                 'ompl_planning_yaml': ompl_config,
+#                 'trajectory_execution.allowed_execution_duration_scaling': 1.2,
+#                 'trajectory_execution.allowed_goal_duration_margin': 0.5,
+#                 'moveit_controller_manager': 'moveit_simple_controller_manager/MoveItSimpleControllerManager',
+#                 'moveit_config': moveit_config
+#             }]
+#         ),
+
+#         # RViz for visualizing the planning and execution
+#         Node(
+#             package='rviz2',
+#             executable='rviz2',
+#             output='screen',
+#             arguments=['-d', rviz_config_file]
+#         ),
+
+#         # Your custom motion planning node (if needed)
+#         Node(
+#             package='robot_motion_planning',
+#             executable='robot_motion_node',
+#             output='screen',
+#             parameters=[{'robot_description': robot_description_content}, robot_description_semantic_param]
+#         )
+#     ])
+
+
 import os
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch_ros.actions import Node
-from launch.substitutions import Command, LaunchConfiguration
-from launch.actions import DeclareLaunchArgument
-from launch_ros.parameter_descriptions import ParameterValue
+import xacro
 
 def generate_launch_description():
-    # Resolve the path to the robot_description package
-    robot_description_package = get_package_share_directory('robot_description')
+    # Paths to configuration files
     urdf_file = os.path.join(get_package_share_directory('robot_description'), 'urdf', 'ur5.urdf.xacro')
     srdf_file = os.path.join(get_package_share_directory('robot_motion_planning'), 'srdf', 'ur5.srdf')
-
+    ompl_config = os.path.join(get_package_share_directory('robot_motion_planning'), 'config', 'ompl_planning.yaml')
+    controllers_config = os.path.join(get_package_share_directory('robot_motion_planning'), 'config', 'controllers.yaml')
+    moveit_config = os.path.join(get_package_share_directory('robot_motion_planning'), 'config', 'moveit_config.yaml')
     rviz_config_file = os.path.join(get_package_share_directory('robot_motion_planning'), 'config', 'moveit.rviz')
 
-    # robot_description = {'robot_description': Command(['xacro ', urdf_file])}
+    # Convert the URDF and SRDF to strings
+    robot_description_config = xacro.process_file(urdf_file).toxml()
+    with open(srdf_file, 'r') as srdf:
+        robot_description_semantic_config = srdf.read()
 
-    # Declare arguments for parameters
-    declare_joint_limits_file_arg = DeclareLaunchArgument(
-        'joint_limits_parameters_file',
-        default_value=os.path.join(get_package_share_directory('robot_motion_planning'), 'config', 'joint_limits.yaml'),
-        description='Path to the joint limits parameters file'
-    )
-
-    declare_kinematics_file_arg = DeclareLaunchArgument(
-        'kinematics_parameters_file',
-        default_value=os.path.join(get_package_share_directory('robot_motion_planning'), 'config', 'default_kinematics.yaml'),
-        description='Path to the kinematics parameters file'
-    )
-
-    declare_physical_file_arg = DeclareLaunchArgument(
-        'physical_parameters_file',
-        default_value=os.path.join(get_package_share_directory('robot_motion_planning'), 'config', 'physical_parameters.yaml'),
-        description='Path to the kinematics parameters file'
-    )
-
-    declare_visual_file_arg = DeclareLaunchArgument(
-        'visual_parameters_file',
-        default_value=os.path.join(get_package_share_directory('robot_motion_planning'), 'config', 'visual_parameters.yaml'),
-        description='Path to the kinematics parameters file'
-    )
-
-    # Define robot description using xacro command with arguments for parameters
-
-    robot_description_content = Command([
-        'xacro ', urdf_file,
-        # ' mesh_path:=', robot_description_package,
-        ' joint_limits_parameters_file:=', LaunchConfiguration('joint_limits_parameters_file'),
-        ' kinematics_parameters_file:=', LaunchConfiguration('kinematics_parameters_file'),
-        ' physical_parameters_file:=', LaunchConfiguration('physical_parameters_file'),
-        ' visual_parameters_file:=', LaunchConfiguration('visual_parameters_file')
-    ])
-
-    robot_description = {
-        'robot_description': ParameterValue(robot_description_content, value_type=str)
-    }
-
-    # robot_description_semantic = {'robot_description_semantic': Command(['cat ', srdf_file])}
-
-    robot_description_semantic_content = Command(['cat ', srdf_file])
-    robot_description_semantic = {
-        'robot_description_semantic': ParameterValue(robot_description_semantic_content, value_type=str)
-    }
-
+    # Define the parameters to pass to nodes
+    robot_description_param = {'robot_description': robot_description_config}
+    robot_description_semantic_param = {'robot_description_semantic': robot_description_semantic_config}
 
     return LaunchDescription([
 
-        # Add the declared arguments to LaunchDescription
-        declare_joint_limits_file_arg,
-        declare_kinematics_file_arg,
-        declare_physical_file_arg,
-        declare_visual_file_arg,
-
+        # Robot State Publisher
         Node(
             package='robot_state_publisher',
             executable='robot_state_publisher',
             output='screen',
-            parameters=[robot_description]
+            parameters=[robot_description_param]
         ),
+
+        # Joint State Publisher
         Node(
-        package='joint_state_publisher',
-        executable='joint_state_publisher',
-        name='joint_state_publisher',
-        output='screen'
+            package='joint_state_publisher',
+            executable='joint_state_publisher',
+            output='screen',
+            parameters=[robot_description_param]
         ),
+
+        # ROS 2 Control Node (for controller manager)
+        Node(
+            package='controller_manager',
+            executable='ros2_control_node',
+            parameters=[robot_description_param, controllers_config],
+            output='screen',
+            arguments=['--ros-args', '--log-level', 'debug']
+        ),
+
+        # Spawn the joint state controller
+        Node(
+            package='controller_manager',
+            executable='spawner',
+            arguments=['joint_state_controller', '--controller-manager', '/controller_manager'],
+            output='screen',
+        ),
+
+        # Spawn the position joint trajectory controller
+        Node(
+            package='controller_manager',
+            executable='spawner',
+            arguments=['pos_joint_traj_controller', '--controller-manager', '/controller_manager'],
+            output='screen',
+        ),
+
+        # Move Group (MoveIt2)
         Node(
             package='moveit_ros_move_group',
             executable='move_group',
             output='screen',
-            parameters=[robot_description, robot_description_semantic]
+            parameters=[
+                robot_description_param,               # Pass the URDF
+                robot_description_semantic_param,      # Pass the SRDF
+                {
+                    'ompl_planning_yaml': ompl_config,
+                    'trajectory_execution.allowed_execution_duration_scaling': 1.2,
+                    'trajectory_execution.allowed_goal_duration_margin': 0.5,
+                    'moveit_controller_manager': 'moveit_simple_controller_manager/MoveItSimpleControllerManager',
+                    'moveit_config': moveit_config
+                }
+            ]
         ),
+
+        # RViz for visualizing the planning and execution
         Node(
             package='rviz2',
             executable='rviz2',
             output='screen',
             arguments=['-d', rviz_config_file]
         ),
+
+        # Custom motion planning node
         Node(
-        package='robot_motion_planning',
-        executable='robot_motion_node',
-        output='screen',
-        parameters=[robot_description, robot_description_semantic]
+            package='robot_motion_planning',
+            executable='robot_motion_node',
+            output='screen',
+            parameters=[robot_description_param, robot_description_semantic_param]  # Ensure parameters are passed here too
         )
     ])

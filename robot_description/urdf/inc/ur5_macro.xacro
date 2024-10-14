@@ -51,7 +51,7 @@
      - Muhammad Asif Rana
   -->
 
-  <!-- <xacro:include filename="ur_transmissions.xacro"/> -->
+  <xacro:include filename="ur_transmissions.xacro"/>
   <xacro:include filename="ur_common.xacro"/>
 
   <xacro:macro name="ur_robot" params="
@@ -62,7 +62,8 @@
       visual_parameters_file
       safety_limits:=false
       safety_pos_margin:=0.15
-      safety_k_position:=20">
+      safety_k_position:=20
+      hw_interface">
 
   <!-- <xacro:arg name="mesh_path" default=""/> -->
 
@@ -80,6 +81,7 @@
 
     <!-- Add URDF transmission elements (for ros_control) -->
     <!-- <xacro:ur_arm_transmission prefix="${prefix}"/> -->
+    <xacro:ur_arm_transmission prefix="${prefix}" hw_interface="${hw_interface}"/>
 
     <!-- links: main serial chain -->
     <link name="${prefix}base_link"/>
