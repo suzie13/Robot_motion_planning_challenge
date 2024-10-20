@@ -1,53 +1,9 @@
-// #include <rclcpp/rclcpp.hpp>
-// #include <moveit/move_group_interface/move_group_interface.h>
-// #include <moveit/planning_scene_interface/planning_scene_interface.h>
-// #include <geometry_msgs/msg/pose_stamped.hpp>
-
-
-// int main(int argc, char** argv)
-// {
-//     rclcpp::init(argc, argv);
-//     auto node = rclcpp::Node::make_shared("robot_motion_node");
-
-//     // Create MoveGroup interface for your robot arm
-//     moveit::planning_interface::MoveGroupInterface move_group(node, "arm");
-
-//     moveit::planning_interface::PlanningSceneInterface planning_scene_interface;
-
-//     geometry_msgs::msg::PoseStamped box_pose;
-//     box_pose.header.frame_id = "world";
-//     box_pose.pose.position.x = 1.0;
-//     box_pose.pose.position.y = 0.0;
-//     box_pose.pose.position.z = 0.5;
-
-//     // Add a box as a collision object
-//     planning_scene_interface.addCollisionObjects({
-//         moveit_msgs::msg::CollisionObject{
-//             .id = "box",
-//             .primitive_poses = {box_pose.pose},
-//             .operation = moveit_msgs::msg::CollisionObject::ADD
-//         }
-//     });
-
-
-
-//     // Planning
-//     move_group.setMaxVelocityScalingFactor(0.1);
-//     move_group.setMaxAccelerationScalingFactor(0.1);
-    
-//     // Example motion to home position
-//     move_group.setNamedTarget("home");
-//     move_group.move();
-
-//     rclcpp::shutdown();
-//     return 0;
-// }
-
 #include <rclcpp/rclcpp.hpp>
 #include <moveit/move_group_interface/move_group_interface.h>
 #include <moveit/planning_scene_interface/planning_scene_interface.h>
 #include <geometry_msgs/msg/pose_stamped.hpp>
 #include <moveit_msgs/msg/collision_object.hpp>
+#include <moveit/planning_scene_monitor/planning_scene_monitor.h>
 
 int main(int argc, char** argv)
 {
@@ -60,6 +16,15 @@ int main(int argc, char** argv)
 
     // Create PlanningSceneInterface to add objects to the environment
     moveit::planning_interface::PlanningSceneInterface planning_scene_interface;
+
+    // Create a PlanningSceneMonitor planning_scene_monitor::PlanningSceneMonitor
+    auto planning_scene_monitor = std::make_shared<planning_scene_monitor::PlanningSceneMonitor>(node, "robot_description");
+
+    // Start the planning scene monitor to publish updates
+    planning_scene_monitor->startPublishingPlanningScene(planning_scene_monitor::PlanningSceneMonitor::UPDATE_SCENE, "/planning_scene");
+    planning_scene_monitor->startSceneMonitor("/monitored_planning_scene");
+    planning_scene_monitor->startWorldGeometryMonitor();
+    planning_scene_monitor->startStateMonitor();
 
     // Define the box pose
     geometry_msgs::msg::PoseStamped box_pose;
