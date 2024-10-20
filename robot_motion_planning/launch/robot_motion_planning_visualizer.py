@@ -2,6 +2,11 @@ import os
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch_ros.actions import Node
+from launch.actions import TimerAction
+from launch.actions import IncludeLaunchDescription
+from launch.launch_description_sources import PythonLaunchDescriptionSource
+from launch.substitutions import PathJoinSubstitution
+from launch_ros.substitutions import FindPackageShare
 import xacro
 
 def generate_launch_description():
@@ -23,7 +28,6 @@ def generate_launch_description():
     robot_description_semantic_param = {'robot_description_semantic': robot_description_semantic_config}
 
     return LaunchDescription([
-
         # Robot State Publisher
         Node(
             package='robot_state_publisher',
@@ -44,25 +48,37 @@ def generate_launch_description():
         Node(
             package='controller_manager',
             executable='ros2_control_node',
-            parameters=[robot_description_param, controllers_config],
+            name='controller_manager',
+            parameters=[robot_description_param, robot_description_semantic_param, controllers_config],
             output='screen',
+            remappings=[
+                ("~/robot_description", "robot_description"),
+            ],
             arguments=['--ros-args', '--log-level', 'debug']
         ),
 
-        # Spawn the joint state controller
-        Node(
-            package='controller_manager',
-            executable='spawner',
-            arguments=['joint_state_controller', '--controller-manager', '/controller_manager'],
-            output='screen',
-        ),
+        # Add a delay to ensure controller_manager initializes before spawners
+        TimerAction(
+            period=5.0,
+            actions=[
+                # Spawner for joint_state_broadcaster
+                Node(
+                    package='controller_manager',
+                    executable='spawner',
+                    name='spawner_joint_state_broadcaster',
+                    arguments=['joint_state_broadcaster', '--controller-manager', '/controller_manager'],
+                    output='screen',
+                ),
 
-        # Spawn the position joint trajectory controller
-        Node(
-            package='controller_manager',
-            executable='spawner',
-            arguments=['pos_joint_traj_controller', '--controller-manager', '/controller_manager'],
-            output='screen',
+                # Spawner for position joint trajectory controller
+                Node(
+                    package='controller_manager',
+                    executable='spawner',
+                    name='spawner_pos_joint_traj_controller',
+                    arguments=['pos_joint_traj_controller', '--controller-manager', '/controller_manager'],
+                    output='screen',
+                ),
+            ],
         ),
 
         # Move Group (MoveIt2)

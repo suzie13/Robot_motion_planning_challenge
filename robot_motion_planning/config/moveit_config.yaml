@@ -29,6 +29,7 @@ moveit_controller_manager: moveit_simple_controller_manager/MoveItSimpleControll
 moveit_simple_controller_manager:
   controller_names:
     - pos_joint_traj_controller  # <-- Main controller name
+    - joint_state_broadcaster
 
 controller_manager:
   ros__parameters:
@@ -43,3 +44,5 @@ controller_manager:
           - wrist_1_joint
           - wrist_2_joint
           - wrist_3_joint
+      - name: joint_state_broadcaster
+        type: joint_state_broadcaster/JointStateBroadcaster

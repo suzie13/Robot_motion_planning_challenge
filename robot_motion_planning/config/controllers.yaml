@@ -1,9 +1,23 @@
 controller_manager:
   ros__parameters:
-    joint_state_controller:
-      type: joint_state_controller/JointStateController
-      state_publish_rate: 100.0  # Ensure this is a double
-    
+    update_rate: 100
+    joints:
+      - shoulder_pan_joint
+      - shoulder_lift_joint
+      - elbow_joint
+      - wrist_1_joint
+      - wrist_2_joint
+      - wrist_3_joint
+    command_interfaces:
+        - position
+    state_interfaces:
+        - position
+        - velocity
+
+    joint_state_broadcaster:
+      type: joint_state_broadcaster/JointStateBroadcaster
+      state_publish_rate: 100.0
+
     pos_joint_traj_controller:
       type: joint_trajectory_controller/JointTrajectoryController
       joints:
@@ -13,4 +27,17 @@ controller_manager:
         - wrist_1_joint
         - wrist_2_joint
         - wrist_3_joint
-      state_publish_rate: 100.0  # Ensure this is a double
+      state_publish_rate: 100.0
+      command_interfaces:
+        - position
+      state_interfaces:
+        - position
+        - velocity
+        - effort
+      command_joints:
+        - shoulder_pan_joint
+        - shoulder_lift_joint
+        - elbow_joint
+        - wrist_1_joint
+        - wrist_2_joint
+        - wrist_3_joint
