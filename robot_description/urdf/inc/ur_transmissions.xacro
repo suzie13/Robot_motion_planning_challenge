@@ -12,22 +12,34 @@
           <plugin>fake_components/GenericSystem</plugin>
       </hardware>
       <joint name="shoulder_pan_joint">
-        <hardware_interface>PositionJointInterface</hardware_interface>
+        <hardware_interface>position</hardware_interface>
+        <command_interface name="position"/>
+        <state_interface name="position"/>
       </joint>
       <joint name="shoulder_lift_joint">
-        <hardware_interface>PositionJointInterface</hardware_interface>
+        <hardware_interface>position</hardware_interface>
+        <command_interface name="position"/>
+        <state_interface name="position"/>
       </joint>
       <joint name="elbow_joint">
-        <hardware_interface>PositionJointInterface</hardware_interface>
+        <hardware_interface>position</hardware_interface>
+        <command_interface name="position"/>
+        <state_interface name="position"/>
       </joint>
       <joint name="wrist_1_joint">
-        <hardware_interface>PositionJointInterface</hardware_interface>
+        <hardware_interface>position</hardware_interface>
+        <command_interface name="position"/>
+        <state_interface name="position"/>
       </joint>
       <joint name="wrist_2_joint">
-        <hardware_interface>PositionJointInterface</hardware_interface>
+        <hardware_interface>position</hardware_interface>
+        <command_interface name="position"/>
+        <state_interface name="position"/>
       </joint>
       <joint name="wrist_3_joint">
-        <hardware_interface>PositionJointInterface</hardware_interface>
+        <hardware_interface>position</hardware_interface>
+        <command_interface name="position"/>
+        <state_interface name="position"/>
       </joint>
     </ros2_control>
 
@@ -35,7 +47,7 @@
     <transmission name="${prefix}shoulder_pan_trans">
       <type>transmission_interface/SimpleTransmission</type>
       <joint name="${prefix}shoulder_pan_joint">
-        <hardware_interface>${hw_interface}</hardware_interface>
+        <hardware_interface>position</hardware_interface>
       </joint>
       <actuator name="${prefix}shoulder_pan_motor">
         <mechanicalReduction>1</mechanicalReduction>
@@ -45,7 +57,7 @@
     <transmission name="${prefix}shoulder_lift_trans">
       <type>transmission_interface/SimpleTransmission</type>
       <joint name="${prefix}shoulder_lift_joint">
-        <hardware_interface>${hw_interface}</hardware_interface>
+        <hardware_interface>position</hardware_interface>
       </joint>
       <actuator name="${prefix}shoulder_lift_motor">
         <mechanicalReduction>1</mechanicalReduction>
@@ -55,7 +67,7 @@
     <transmission name="${prefix}elbow_trans">
       <type>transmission_interface/SimpleTransmission</type>
       <joint name="${prefix}elbow_joint">
-        <hardware_interface>${hw_interface}</hardware_interface>
+        <hardware_interface>position</hardware_interface>
       </joint>
       <actuator name="${prefix}elbow_motor">
         <mechanicalReduction>1</mechanicalReduction>
@@ -66,7 +78,7 @@
     <transmission name="${prefix}wrist_1_trans">
       <type>transmission_interface/SimpleTransmission</type>
       <joint name="${prefix}wrist_1_joint">
-        <hardware_interface>${hw_interface}</hardware_interface>
+        <hardware_interface>position</hardware_interface>
       </joint>
       <actuator name="${prefix}wrist_1_motor">
         <mechanicalReduction>1</mechanicalReduction>
@@ -76,7 +88,7 @@
     <transmission name="${prefix}wrist_2_trans">
       <type>transmission_interface/SimpleTransmission</type>
       <joint name="${prefix}wrist_2_joint">
-        <hardware_interface>${hw_interface}</hardware_interface>
+        <hardware_interface>position</hardware_interface>
       </joint>
       <actuator name="${prefix}wrist_2_motor">
         <mechanicalReduction>1</mechanicalReduction>
@@ -86,7 +98,7 @@
     <transmission name="${prefix}wrist_3_trans">
       <type>transmission_interface/SimpleTransmission</type>
       <joint name="${prefix}wrist_3_joint">
-        <hardware_interface>${hw_interface}</hardware_interface>
+        <hardware_interface>position</hardware_interface>
       </joint>
       <actuator name="${prefix}wrist_3_motor">
         <mechanicalReduction>1</mechanicalReduction>
