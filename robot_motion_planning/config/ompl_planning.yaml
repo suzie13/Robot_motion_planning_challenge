@@ -1,4 +1,7 @@
-planner_configs:
-  RRTConnectkConfigDefault:
-    type: geometric::RRTConnect
-    range: 0.0
+ros__parameters:
+  ompl_planning_pipeline:
+    planner_configs: ['RRTConnect']
+  planner_configs:
+    RRTConnect:
+      type: geometric::RRTConnect
+      range: 0.0

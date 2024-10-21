@@ -12,7 +12,6 @@ controller_manager:
         - position
     state_interfaces:
         - position
-        - velocity
 
     joint_state_broadcaster:
       type: joint_state_broadcaster/JointStateBroadcaster

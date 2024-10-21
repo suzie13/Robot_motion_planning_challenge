@@ -3,20 +3,26 @@ from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch_ros.actions import Node
 from launch.actions import TimerAction
-from launch.actions import IncludeLaunchDescription
-from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import PathJoinSubstitution
-from launch_ros.substitutions import FindPackageShare
 import xacro
 
 def generate_launch_description():
     # Paths to configuration files
     urdf_file = os.path.join(get_package_share_directory('robot_description'), 'urdf', 'ur5.urdf.xacro')
     srdf_file = os.path.join(get_package_share_directory('robot_motion_planning'), 'srdf', 'ur5.srdf')
-    ompl_config = os.path.join(get_package_share_directory('robot_motion_planning'), 'config', 'ompl_planning.yaml')
-    controllers_config = os.path.join(get_package_share_directory('robot_motion_planning'), 'config', 'controllers.yaml')
     moveit_config = os.path.join(get_package_share_directory('robot_motion_planning'), 'config', 'moveit_config.yaml')
+    controllers_config = os.path.join(get_package_share_directory('robot_motion_planning'), 'config', 'controllers.yaml')
     rviz_config_file = os.path.join(get_package_share_directory('robot_motion_planning'), 'config', 'moveit.rviz')
+    kinematics_yaml = os.path.join(get_package_share_directory('robot_motion_planning'), 'config', 'kinematics.yaml')
+
+    kinematics_param = {
+    'robot_description_kinematics': {
+        'manipulator': {
+            'kinematics_solver': 'kdl_kinematics_plugin/KDLKinematicsPlugin',
+            'kinematics_solver_search_resolution': 0.005,
+            'kinematics_solver_timeout': 0.1
+        }
+    }
+}
 
     # Convert the URDF and SRDF to strings
     robot_description_config = xacro.process_file(urdf_file).toxml()
@@ -49,12 +55,11 @@ def generate_launch_description():
             package='controller_manager',
             executable='ros2_control_node',
             name='controller_manager',
-            parameters=[robot_description_param, robot_description_semantic_param, controllers_config],
+            parameters=[controllers_config],
             output='screen',
             remappings=[
                 ("~/robot_description", "robot_description"),
             ],
-            arguments=['--ros-args', '--log-level', 'debug']
         ),
 
         # Add a delay to ensure controller_manager initializes before spawners
@@ -89,14 +94,9 @@ def generate_launch_description():
             parameters=[
                 robot_description_param,               # Pass the URDF
                 robot_description_semantic_param,      # Pass the SRDF
-                {
-                    'ompl_planning_yaml': ompl_config,
-                    'trajectory_execution.allowed_execution_duration_scaling': 1.2,
-                    'trajectory_execution.allowed_goal_duration_margin': 0.5,
-                    'moveit_controller_manager': 'moveit_simple_controller_manager/MoveItSimpleControllerManager',
-                    'moveit_config': moveit_config
-                }
-            ]
+                moveit_config,                        # Use moveit_config.yaml
+                kinematics_yaml
+            ],
         ),
 
         # RViz for visualizing the planning and execution
@@ -112,6 +112,6 @@ def generate_launch_description():
             package='robot_motion_planning',
             executable='robot_motion_node',
             output='screen',
-            parameters=[robot_description_param, robot_description_semantic_param]  # Ensure parameters are passed here too
+            parameters=[robot_description_param, robot_description_semantic_param, kinematics_yaml]
         )
     ])
