@@ -97,6 +97,9 @@ def generate_launch_description():
                 moveit_config,                        # Use moveit_config.yaml
                 kinematics_yaml
             ],
+            remappings=[
+                ('/robot_description_semantic', '/robot_description_semantic')
+            ],
         ),
 
         # RViz for visualizing the planning and execution
@@ -104,6 +107,10 @@ def generate_launch_description():
             package='rviz2',
             executable='rviz2',
             output='screen',
+            parameters=[
+                robot_description_param,
+                robot_description_semantic_param
+            ],
             arguments=['-d', rviz_config_file]
         ),
 
