@@ -1,45 +1,54 @@
 <?xml version="1.0"?>
 
 <robot xmlns:xacro="http://wiki.ros.org/xacro">
-  <!-- Macro for defining transmissions and ros2_control interface -->
-  <!-- <xacro:macro name="ur_arm_transmission" prefix="" hw_interface="PositionJointInterface"> -->
   <xacro:macro name="ur_arm_transmission" params="prefix hw_interface">
 
     <!-- ros2_control interface for controlling the joint -->
-    <!-- ros2_control interface for controlling the joint -->
-    <ros2_control name="ur5_robot" type="system">
+    <ros2_control name="IgnitionSystem" type="system">
       <hardware>
-          <plugin>fake_components/GenericSystem</plugin>
+          <plugin>ign_ros2_control/IgnitionSystem</plugin>
       </hardware>
       <joint name="shoulder_pan_joint">
         <hardware_interface>position</hardware_interface>
         <command_interface name="position"/>
-        <state_interface name="position"/>
+        <state_interface name="position">
+          <!-- <param name="initial_value">0.0</param> -->
+        </state_interface>
       </joint>
       <joint name="shoulder_lift_joint">
         <hardware_interface>position</hardware_interface>
         <command_interface name="position"/>
-        <state_interface name="position"/>
+        <state_interface name="position">
+          <!-- <param name="initial_value">0.0</param> -->
+        </state_interface>
       </joint>
       <joint name="elbow_joint">
         <hardware_interface>position</hardware_interface>
         <command_interface name="position"/>
-        <state_interface name="position"/>
+        <state_interface name="position">
+          <!-- <param name="initial_value">0.0</param> -->
+        </state_interface>
       </joint>
       <joint name="wrist_1_joint">
         <hardware_interface>position</hardware_interface>
         <command_interface name="position"/>
-        <state_interface name="position"/>
+        <state_interface name="position">
+          <!-- <param name="initial_value">0.0</param> -->
+        </state_interface>
       </joint>
       <joint name="wrist_2_joint">
         <hardware_interface>position</hardware_interface>
         <command_interface name="position"/>
-        <state_interface name="position"/>
+        <state_interface name="position">
+          <!-- <param name="initial_value">0.0</param> -->
+        </state_interface>
       </joint>
       <joint name="wrist_3_joint">
         <hardware_interface>position</hardware_interface>
         <command_interface name="position"/>
-        <state_interface name="position"/>
+        <state_interface name="position">
+          <!-- <param name="initial_value">0.0</param> -->
+        </state_interface>
       </joint>
     </ros2_control>
 
@@ -106,4 +115,12 @@
     </transmission>
 
   </xacro:macro>
+
+  <gazebo>
+    <plugin filename="libign_ros2_control-system.so" name="ign_ros2_control::IgnitionROS2ControlPlugin">
+      <parameters>$(find robot_motion_planning)/config/controllers.yaml</parameters>
+      <controller_manager_name>controller_manager</controller_manager_name>
+    </plugin>
+  </gazebo>
+
 </robot>

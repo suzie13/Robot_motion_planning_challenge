@@ -2,7 +2,7 @@ import os
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch_ros.actions import Node
-from launch.actions import TimerAction
+from launch.actions import TimerAction, ExecuteProcess
 import xacro
 
 def generate_launch_description():
@@ -13,6 +13,9 @@ def generate_launch_description():
     controllers_config = os.path.join(get_package_share_directory('robot_motion_planning'), 'config', 'controllers.yaml')
     rviz_config_file = os.path.join(get_package_share_directory('robot_motion_planning'), 'config', 'moveit.rviz')
     kinematics_yaml = os.path.join(get_package_share_directory('robot_motion_planning'), 'config', 'kinematics.yaml')
+
+    world_path = os.path.join(get_package_share_directory('robot_motion_planning'), 'worlds', 'world.sdf')
+
 
     kinematics_param = {
     'robot_description_kinematics': {
@@ -55,7 +58,7 @@ def generate_launch_description():
             package='controller_manager',
             executable='ros2_control_node',
             name='controller_manager',
-            parameters=[controllers_config],
+            parameters=[robot_description_param, controllers_config],
             output='screen',
             remappings=[
                 ("~/robot_description", "robot_description"),
@@ -120,5 +123,31 @@ def generate_launch_description():
             executable='robot_motion_node',
             output='screen',
             parameters=[robot_description_param, robot_description_semantic_param, kinematics_yaml]
-        )
+        ),
+
+        # Launch Ignition Gazebo with GUI
+        ExecuteProcess(
+            cmd=['ign', 'gazebo', '--gui', '-r', world_path],
+            output='screen'
+        ),
+
+        # Spawn the robot in Ignition Gazebo
+        Node(
+            package='ros_gz_sim',
+            executable='create',
+            arguments=['-name', 'ur5_robot', '-topic', 'robot_description', '-x', '0', '-y', '0', '-z', '0.5'],
+            output='screen'
+        ),
+
+        # Bridge ROS 2 and Ignition Gazebo
+        Node(
+            package='ros_ign_bridge',
+            executable='parameter_bridge',
+            name='ros_ign_bridge',
+            output='screen',
+            arguments=[
+                '/model/ur5_robot/joint_state@sensor_msgs/msg/JointState@ignition.msgs.Model',
+                '/model/ur5_robot/cmd_vel@geometry_msgs/msg/Twist@ignition.msgs.Twist'
+            ]
+        ),
     ])

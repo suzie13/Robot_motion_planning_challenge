@@ -11,15 +11,17 @@ find_package(rclcpp REQUIRED)
 find_package(moveit_core REQUIRED)
 find_package(moveit_ros_planning REQUIRED)
 find_package(moveit_ros_planning_interface REQUIRED)
-# find_package(moveit_ros_visualization REQUIRED)
 find_package(controller_manager REQUIRED)
 find_package(ros2_control REQUIRED)
-# find_package(ros2_controllers REQUIRED)  # Include this for position controllers
+find_package(ros2_controllers REQUIRED)  # Include this for position controllers
 find_package(trajectory_msgs REQUIRED)
-find_package(control_msgs)
+find_package(control_msgs REQUIRED)
 find_package(controller_interface REQUIRED)
 find_package(realtime_tools REQUIRED)
-find_package(ros2_controllers REQUIRED)
+
+find_package(ros_gz_sim REQUIRED)
+find_package(ros_gz_bridge REQUIRED)
+find_package(ign_ros2_control REQUIRED)
 
 
 
@@ -28,17 +30,20 @@ add_executable(robot_motion_node src/robot_motion.cpp)
 
 # Ensure all necessary packages are linked
 ament_target_dependencies(robot_motion_node 
-  rclcpp 
-  moveit_core 
-  moveit_ros_planning 
-  moveit_ros_planning_interface 
-  controller_manager 
-  ros2_control 
-  ros2_controllers 
-  controller_interface 
-  realtime_tools 
-  control_msgs 
+  rclcpp
+  moveit_core
+  moveit_ros_planning
+  moveit_ros_planning_interface
+  controller_manager
+  ros2_control
+  ros2_controllers
+  controller_interface
+  realtime_tools
+  control_msgs
   trajectory_msgs
+  ros_gz_sim
+  ros_gz_bridge
+  ign_ros2_control
 )
 
 # Install targets (binaries)
@@ -55,6 +60,9 @@ install(DIRECTORY config/
 )
 install(DIRECTORY srdf/
   DESTINATION share/${PROJECT_NAME}/srdf
+)
+install(DIRECTORY worlds/
+  DESTINATION share/${PROJECT_NAME}/worlds
 )
 
 
