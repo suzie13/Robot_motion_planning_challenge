@@ -7,6 +7,7 @@
     <ros2_control name="IgnitionSystem" type="system">
       <hardware>
           <plugin>ign_ros2_control/IgnitionSystem</plugin>
+          <!-- <plugin>test_system</plugin> -->
       </hardware>
       <joint name="shoulder_pan_joint">
         <hardware_interface>position</hardware_interface>
@@ -117,7 +118,9 @@
   </xacro:macro>
 
   <gazebo>
-    <plugin filename="libign_ros2_control-system.so" name="ign_ros2_control::IgnitionROS2ControlPlugin">
+    <plugin filename="ign_ros2_control-system" name="ign_ros2_control::IgnitionROS2ControlPlugin">
+      <robot_param>robot_description</robot_param>
+      <robot_param_node>robot_state_publisher</robot_param_node>
       <parameters>$(find robot_motion_planning)/config/controllers.yaml</parameters>
       <controller_manager_name>controller_manager</controller_manager_name>
     </plugin>
